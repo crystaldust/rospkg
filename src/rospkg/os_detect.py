@@ -241,6 +241,37 @@ class OpenEmbedded(OsDetector):
             return ""
         raise OsNotDetected('called in incorrect OS')
 
+class OpenEuler(OsDetector):
+    """
+    Detect OpenEuler.
+    """
+    def __init__(self, release_file='/etc/openEuler-release'):
+        self._release_file = release_file
+
+    def is_os(self):
+        os_list = read_issue(self._release_file)
+        return os_list and os_list[0] == 'openEuler'
+
+    def get_version(self):
+        if self.is_os():
+            os_list = read_issue(self._release_file)
+            idx = os_list.index('release')
+            return os_list[idx + 1]
+        raise OsNotDetected('called in incorrect OS')
+
+    def get_codename(self):
+        if self.is_os():
+            os_list = read_issue(self._release_file)
+            idx = os_list.index('release')
+            matches = [x for x in os_list if x[0] == '(']
+            codename = matches[0][1:]
+            if codename[-1] == ')':
+                codename = codename[:-1]
+            return codename.lower()
+        raise OsNotDetected('called in incorrect OS')
+
+
+
 
 class OpenSuse(OsDetector):
     """
@@ -726,6 +757,7 @@ OS_MINT = 'mint'
 OS_MX = 'mx'
 OS_NEON = 'neon'
 OS_OPENEMBEDDED = 'openembedded'
+OS_OPENEULER = 'openeuler'
 OS_OPENSUSE = 'opensuse'
 OS_OPENSUSE13 = 'opensuse'
 OS_TIZEN = 'tizen'
@@ -757,6 +789,7 @@ OsDetect.register_default(OS_MINT, LsbDetect("LinuxMint"))
 OsDetect.register_default(OS_MX, LsbDetect("MX"))
 OsDetect.register_default(OS_NEON, LsbDetect("neon"))
 OsDetect.register_default(OS_OPENEMBEDDED, OpenEmbedded())
+OsDetect.register_default(OS_OPENEULER, OpenEuler())
 OsDetect.register_default(OS_OPENSUSE, OpenSuse())
 OsDetect.register_default(OS_OPENSUSE13, OpenSuse(brand_file='/etc/SUSE-brand', release_file=None))
 OsDetect.register_default(OS_OPENSUSE, FdoDetect("opensuse-tumbleweed"))
