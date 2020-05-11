@@ -5,6 +5,7 @@ syntax: glob
 *.DS_Store
 *~
 *.log
+*.idea
 .coverage
 nosetests.xml
 src/rospkg.egg-info
